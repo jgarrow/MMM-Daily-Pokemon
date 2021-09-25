@@ -263,7 +263,7 @@ Module.register("MMM-Daily-Pokemon", {
 	},
 
 	getStyles: function() {
-		return [this.file('MMM-DailyPokemon.css')]
+		return [this.file('MMM-Daily-Pokemon.css')]
 	},
 
 	getTranslations: function() {

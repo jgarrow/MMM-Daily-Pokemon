@@ -1,8 +1,8 @@
-# MMM-DailyPokemon
+# MMM-Daily-Pokemon
 
 This is a module for the [MagicMirror²](https://github.com/MichMich/MagicMirror/).
 
-MMM-DailyPokemon provides a unique Pokemon each day, as well as information about that Pokemon.
+MMM-Daily-Pokemon provides a unique Pokemon each day, as well as information about that Pokemon.
 
 Built Using [PokeAPI](https://pokeapi.co/)
 
@@ -12,8 +12,8 @@ Built Using [PokeAPI](https://pokeapi.co/)
 
 To install, clone this repo into `~/MagicMirror/modules` directory. Then move in the folder and install required libraries
 ```
-git clone https://github.com/NolanKingdon/MMM-DailyPokemon
-cd MMM-DailyPokemon
+git clone https://github.com/jgarrow/MMM-Daily-Pokemon.git
+cd MMM-Daily-Pokemon
 npm install
 ```
 
@@ -22,7 +22,7 @@ To use this module, add the following configuration block to the modules array i
 var config = {
     modules: [
         {
-            module: "MMM-DailyPokemon",
+            module: "MMM-Daily-Pokemon",
             position: "top_center",
             config: {
                 updateInterval: 600000,
@@ -64,14 +64,14 @@ var config = {
 var config = {
     modules: [
         {
-            module: "MMM-DailyPokemon",
+            module: "MMM-Daily-Pokemon",
             position: "top_center",
             config: {
-                updateInterval: 86400000, //1 Day
-                grayscale: true,//Turns pokemon image and type images gray to match magic mirror styles
-                minPoke: 1, //Default to all pokemon
-                maxPoke: 802,//Highest number - 802 pokemon currently exist
-                showType: true, //Shows type icons below pokemon's image
+                updateInterval: 86400000, // 1 Day
+                grayscale: true, // Turns pokemon image and type images gray to match magic mirror styles
+                minPoke: 1, // Default to all pokemon
+                maxPoke: 802, // Highest number - 802 pokemon currently exist
+                showType: true, // Shows type icons below pokemon's image
                 stats: true,
                 language: "en",
                 genera: true,
