@@ -59,7 +59,7 @@ Module.register("mmm-daily-pokemon", {
 
 		const languageApiURL = "https://pokeapi.co/api/v2/pokemon-species/" + pokeNumber + "/";
 		const languageHttpRequest = new XMLHttpRequest();
-		const translatedName;
+		let translatedName;
 		const languageChosen = this.config.language;
 
 		languageHttpRequest.onreadystatechange = function() {
