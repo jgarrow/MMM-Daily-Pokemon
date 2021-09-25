@@ -1,13 +1,13 @@
 /* global Module */
 
 /* Magic Mirror
- * Module: MMM-Daily-Pokemon
+ * Module: mmm-daily-pokemon
  *
  * By
  * MIT Licensed.
  */
 
-Module.register("MMM-Daily-Pokemon", {
+Module.register("mmm-daily-pokemon", {
 	defaults: {
 		updateInterval: 86400000, // 1 Day
 		grayscale: true, // Turns pokemon image and type images gray to match magic mirror styles
@@ -263,7 +263,7 @@ Module.register("MMM-Daily-Pokemon", {
 	},
 
 	getStyles: function() {
-		return [this.file('MMM-Daily-Pokemon.css')]
+		return [this.file('mmm-daily-pokemon.css')]
 	},
 
 	getTranslations: function() {

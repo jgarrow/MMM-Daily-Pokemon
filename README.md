@@ -1,8 +1,8 @@
-# MMM-Daily-Pokemon
+# mmm-daily-pokemon
 
 This is a module for the [MagicMirror²](https://github.com/MichMich/MagicMirror/).
 
-MMM-Daily-Pokemon provides a unique Pokemon each day, as well as information about that Pokemon.
+mmm-daily-pokemon provides a unique Pokemon each day, as well as information about that Pokemon.
 
 Built Using [PokeAPI](https://pokeapi.co/)
 
@@ -12,8 +12,8 @@ Built Using [PokeAPI](https://pokeapi.co/)
 
 To install, clone this repo into `~/MagicMirror/modules` directory. Then move in the folder and install required libraries
 ```
-git clone https://github.com/jgarrow/MMM-Daily-Pokemon.git
-cd MMM-Daily-Pokemon
+git clone https://github.com/jgarrow/mmm-daily-pokemon.git
+cd mmm-daily-pokemon
 npm install
 ```
 
@@ -22,7 +22,7 @@ To use this module, add the following configuration block to the modules array i
 var config = {
     modules: [
         {
-            module: "MMM-Daily-Pokemon",
+            module: "mmm-daily-pokemon",
             position: "top_center",
             config: {
                 updateInterval: 600000,
@@ -64,7 +64,7 @@ var config = {
 var config = {
     modules: [
         {
-            module: "MMM-Daily-Pokemon",
+            module: "mmm-daily-pokemon",
             position: "top_center",
             config: {
                 updateInterval: 86400000, // 1 Day

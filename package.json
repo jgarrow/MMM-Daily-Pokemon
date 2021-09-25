@@ -1,8 +1,8 @@
 {
-  "name": "MMM-Daily-Pokemon",
+  "name": "mmm-daily-pokemon",
   "version": "1.0.0",
   "description": "Magic Mirror module to display info about a Pokémon with data fetched from the PokéAPI",
-  "main": "MMM-Daily-Pokemon.js",
+  "main": "mmm-daily-pokemon.js",
   "author": "",
   "license": "MIT",
   "devDependencies": {
