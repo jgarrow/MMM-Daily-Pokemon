@@ -17,9 +17,6 @@
 #poke-wrapper {
 	margin-left: auto;
 	margin-right: auto;
-	/*position: relative;
-	bottom: 30px;
-	top: 0px;*/
 }
 
 #flex-wrapper div {
@@ -36,31 +33,35 @@
 	border-bottom: 1px solid white;
 	color: white;
 	text-align: center;
-	margin-bottom: 30px;
 }
 
 #poke-subname {
 	text-align: center;
 	font-size: 0.6em;
-	margin-top: -20px;
+}
+
+#img-wrapper {
+	height: 150px;
+	width: 100%;
 }
 
 #poke-pic {
-	width: 100px;
-	height: auto;
+	width: auto;
+	height: 100%;
 }
 
 #poke-pic-grayscale {
-	position: relative;
-	bottom: 50px;
-	width: 200px;
-	height: auto;
+	width: auto;
+	height: 100%;
 	filter: grayscale(100%);
 }
 
-#poke-pic-grayscale-type {
-	position: relative;
-	bottom: 100px;
+.type-img-wrapper {
+	height: 50px;
+	width: 50px;
+}
+
+.poke-pic-grayscale-type {
 	width: 50px;
 	height: auto;
 	filter: grayscale(100%);
