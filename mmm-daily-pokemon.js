@@ -192,7 +192,7 @@ Module.register("mmm-daily-pokemon", {
 			typesContainer.appendChild(typeImgWrapper);
 		})
 
-		types.style.justifyContent = types.length > 1 ? "space-evenly" : "center";
+		typesContainer.style.justifyContent = types.length > 1 ? "space-evenly" : "center";
 
 		pokeWrapper.appendChild(typesContainer);
 		flexWrapper.appendChild(pokeWrapper);
