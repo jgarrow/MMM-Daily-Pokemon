@@ -20,6 +20,7 @@ Module.register("mmm-daily-pokemon", {
 		gbaMode: true, // Changes font to GBA style
 		nameSize: 32, // Changes header size - px
 		flavorText: false, // Displays flavor text for the pokemon
+		useSprite: true // if false, uses official artwork instead
 	},
 
 	requiresVersion: "2.1.0", // Required version of MagicMirror
@@ -95,7 +96,7 @@ Module.register("mmm-daily-pokemon", {
 						// get first flavor text matching selected language
 						const flavorTextObj = response.flavor_text_entries.find(checkLanguage);
 						// remove carriage returns, newlines, form-feeds for clean display
-						const sanitizedText = flavorTextObj.flavor_text.replace(/\r\n/g, "")
+						let sanitizedText = flavorTextObj.flavor_text.replace(/\r\n/g, "")
 						sanitizedText = sanitizedText.replace(/\f/g, " ")
 
 						flavorTextDisplay.innerHTML = sanitizedText
@@ -127,13 +128,14 @@ Module.register("mmm-daily-pokemon", {
 	},
 
 	createContent: function(data, wrapper) { // Creates the elements for display
+		const {id, name, stats, types} = data;
 		const pokeWrapper = document.createElement("div");
 		pokeWrapper.id = "poke-info";
 		const flexWrapper = document.createElement("div");
 		flexWrapper.id = "flex-wrapper";
 		const pokeName = document.createElement("p");
 		// TODO - maybe add an option to get rid of Pokedex #
-		pokeName.innerHTML = data.name.charAt(0).toUpperCase() + data.name.slice(1) + " - #" + data.id;
+		pokeName.innerHTML = name.charAt(0).toUpperCase() + name.slice(1) + "<br />" + "#" + id;
 		pokeName.id = "poke-name";
 
 		if (this.config.gbaMode) {
@@ -163,23 +165,24 @@ Module.register("mmm-daily-pokemon", {
 		const pokePicWrapper = document.createElement("div");
 		pokePicWrapper.id = "img-wrapper";
 		const pokePic = document.createElement("img");
-		pokePic.src = data.sprites.front_default;
+		pokePic.src = this.config.useSprite ? data.sprites.front_default : `https://dex-images.s3-us-west-1.amazonaws.com/img/${id}.png`;
 		pokePic.id = "poke-pic";
 
 		if (this.config.grayscale) {
 			pokePic.id = "poke-pic-grayscale";
 		}
+
 		pokePicWrapper.appendChild(pokePic);
 		pokeWrapper.appendChild(pokePicWrapper);
 
 		const types = document.createElement("div");
 		types.id = "poke-types";
 
-		data.types.forEach(({type}, i) => {
+		types.forEach(({type}, i) => {
 			const typeImgWrapper = document.createElement("div");
 			typeImgWrapper.className = "type-img-wrapper"
 			const typeImg = document.createElement("img");
-			typeImg.src = "./images/type-icons/" + type.name.toLowerCase() + "_icon_SwSh.png";
+			typeImg.src = this.file("images/type-icons/" + type.name[0].toUpperCase() + type.name.slice(1).toLowerCase() + "_icon_SwSh.png");
 
 			if (this.config.grayscale) {
 				typeImg.className = "poke-pic-grayscale-type";
@@ -188,27 +191,6 @@ Module.register("mmm-daily-pokemon", {
 			typeImgWrapper.appendChild(typeImg);
 			types.appendChild(typeImgWrapper);
 		})
-
-		// const type1 = document.createElement("span");
-		// const type1Img = document.createElement("img");
-		// type1Img.src = "https://serebii.net/pokedex-dp/type/" + data.types[0].type.name + ".gif"
-		// if(this.config.grayscale){
-		// 		type1Img.id = "poke-pic-grayscale-type"
-		// 	}
-		// type1.appendChild(type1Img);
-		// //type1.innerHTML = data.types[0].type.name.charAt(0).toUpperCase() + data.types[0].type.name.slice(1);
-		// types.appendChild(type1);
-		// if(data.types[1]){
-		// 	const type2 = document.createElement("span");
-		// 	const type2Img = document.createElement("img");
-		// 	if(this.config.grayscale){
-		// 		type2Img.id = "poke-pic-grayscale-type"
-		// 	}
-		// 	type2Img.src = "https://serebii.net/pokedex-dp/type/" + data.types[1].type.name + ".gif"
-		// 	//type2.innerHTML = data.types[1].type.name.charAt(0).toUpperCase() + data.types[1].type.name.slice(1)
-		// 	type2.appendChild(type2Img);
-		// 	types.appendChild(type2);
-		// }
 
 		pokeWrapper.appendChild(types);
 		flexWrapper.appendChild(pokeWrapper);
@@ -227,8 +209,8 @@ Module.register("mmm-daily-pokemon", {
 				const tdName = document.createElement("td");
 				const tdStat = document.createElement("td");
 
-				tdName.innerHTML = this.translate(data.stats[i].stat.name);
-				tdStat.innerHTML = data.stats[i].base_stat;
+				tdName.innerHTML = this.translate(stats[i].stat.name);
+				tdStat.innerHTML = stats[i].base_stat;
 
 				tr.appendChild(tdName);
 				tr.appendChild(tdStat);
@@ -246,7 +228,7 @@ Module.register("mmm-daily-pokemon", {
 			flavorTextWrapper.id = "flavor-text-wrapper";
 
 			const flavorText = document.createElement("p");
-			flavorText.innerHTML = data.flavorTextDisplay ? data.flavorTextDisplay : "";
+			flavorText.innerHTML = data?.flavorTextDisplay || "";
 			flavorText.id = "flavor-text";
 
 			flavorText.style.fontSize = "24px";
@@ -268,8 +250,8 @@ Module.register("mmm-daily-pokemon", {
 
 	getTranslations: function() {
 		return {
-			en: "translations/en.json",
-			fr: "translations/fr.json"
+			en: this.file("translations/en.json"),
+			fr: this.file("translations/fr.json")
 		}
 	}
 });
