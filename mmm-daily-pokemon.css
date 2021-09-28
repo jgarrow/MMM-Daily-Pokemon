@@ -55,11 +55,6 @@
 	filter: grayscale(100%);
 }
 
-.type-img-wrapper {
-	height: 50px;
-	width: 50px;
-}
-
 .poke-pic-grayscale-type {
 	width: 50px;
 	height: auto;
@@ -68,6 +63,13 @@
 
 #poke-types {
 	padding: 0px;
+	display: flex;
+	align-items: center;
+}
+
+#poke-types .type-img-wrapper {
+	width: 50px;
+	height: 50px;
 }
 
 #poke-types span {

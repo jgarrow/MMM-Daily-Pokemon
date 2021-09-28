@@ -83,7 +83,7 @@ Module.register("mmm-daily-pokemon", {
 						if(nameObject.language.name == languageChosen){
 							translatedName = nameObject.name;
 							const pokeName = document.getElementById("poke-name");
-							pokeName.innerHTML = translatedName.charAt(0).toUpperCase() + translatedName.slice(1) + " - #" + pokeNumber
+							pokeName.innerHTML = translatedName.charAt(0).toUpperCase() + translatedName.slice(1) + " <br />#" + pokeNumber
 						}
 					});
 
@@ -192,6 +192,8 @@ Module.register("mmm-daily-pokemon", {
 			typesContainer.appendChild(typeImgWrapper);
 		})
 
+		types.style.justifyContent = types.length > 1 ? "space-evenly" : "center";
+
 		pokeWrapper.appendChild(typesContainer);
 		flexWrapper.appendChild(pokeWrapper);
 
@@ -250,8 +252,8 @@ Module.register("mmm-daily-pokemon", {
 
 	getTranslations: function() {
 		return {
-			en: this.file("translations/en.json"),
-			fr: this.file("translations/fr.json")
+			en: "translations/en.json",
+			fr: "translations/fr.json"
 		}
 	}
 });
