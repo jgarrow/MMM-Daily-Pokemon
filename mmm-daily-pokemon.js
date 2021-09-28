@@ -175,8 +175,8 @@ Module.register("mmm-daily-pokemon", {
 		pokePicWrapper.appendChild(pokePic);
 		pokeWrapper.appendChild(pokePicWrapper);
 
-		const types = document.createElement("div");
-		types.id = "poke-types";
+		const typesContainer = document.createElement("div");
+		typesContainer.id = "poke-types";
 
 		types.forEach(({type}, i) => {
 			const typeImgWrapper = document.createElement("div");
@@ -189,10 +189,10 @@ Module.register("mmm-daily-pokemon", {
 			}
 
 			typeImgWrapper.appendChild(typeImg);
-			types.appendChild(typeImgWrapper);
+			typesContainer.appendChild(typeImgWrapper);
 		})
 
-		pokeWrapper.appendChild(types);
+		pokeWrapper.appendChild(typesContainer);
 		flexWrapper.appendChild(pokeWrapper);
 
 		statWrapper = document.createElement("div");
