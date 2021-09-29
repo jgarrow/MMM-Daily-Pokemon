@@ -12,7 +12,12 @@
 @font-face {
 	font-family: pokegb;
 	src: url(fonts/pokemon_font.ttf);
-	}
+}
+
+@font-face {
+	font-family: Montserrat;
+	src: url(fonts/Montserrat-Regular.ttf);
+}
 
 #poke-wrapper {
 	margin-left: auto;

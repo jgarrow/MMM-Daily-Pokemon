@@ -129,6 +129,10 @@ Module.register("mmm-daily-pokemon", {
 
 	createContent: function(data, wrapper) { // Creates the elements for display
 		const {id, name, stats, types} = data;
+
+		const bodyEl = document.getElementById('body');
+		bodyEl.style.fontFamily = this.config.gbaMode ? "'pokegb'" : "'Montserrat'";
+
 		const pokeWrapper = document.createElement("div");
 		pokeWrapper.id = "poke-info";
 		const flexWrapper = document.createElement("div");
@@ -138,15 +142,11 @@ Module.register("mmm-daily-pokemon", {
 		pokeName.innerHTML = name.charAt(0).toUpperCase() + name.slice(1) + "<br />" + "#" + id;
 		pokeName.id = "poke-name";
 
-		if (this.config.gbaMode) {
-			pokeName.style.fontFamily = "'pokegb'";
-		}
-
 		// Font size/style modification
 		if (this.config.nameSize != 32) {
-			pokeName.style.cssText = "font-size:" + this.config.nameSize + "px;" + this.config.gbaMode ? " font-family: 'pokegb';" : "";
+			pokeName.style.cssText = "font-size:" + this.config.nameSize + "px;";
 		} else if (this.config.nameSize == 32 && this.config.gbaMode) { // Changing default size if gbaMode is enabled without size changes added
-			pokeName.style.cssText = "font-size: 22px; font-family: 'pokegb';";
+			pokeName.style.cssText = "font-size: 22px;";
 		}
 
 		wrapper.appendChild(pokeName);
@@ -155,10 +155,6 @@ Module.register("mmm-daily-pokemon", {
 			const pokeSubName = document.createElement("p");
 			// TODO - maybe add an option to get rid of Pokedex #
 			pokeSubName.id = "poke-subname";
-			if (this.config.gbaMode) {
-				pokeSubName.style.cssText = "font-family: 'pokegb'";
-			}
-
 			wrapper.appendChild(pokeSubName);
 		}
 
@@ -202,10 +198,6 @@ Module.register("mmm-daily-pokemon", {
 		if (this.config.stats){
 			const statTable = document.createElement("table");
 
-			if (this.config.gbaMode) {
-				statTable.style.cssText = "font-family: 'pokegb'";
-			}
-
 			for (let i = 5; i >= 0; i--) {//Inverted to list stats in right order
 				const tr = document.createElement("tr");
 				const tdName = document.createElement("td");
@@ -237,7 +229,6 @@ Module.register("mmm-daily-pokemon", {
 			flavorText.style.lineHeight = "1.5";
 
 			if (this.config.gbaMode) {
-				flavorText.style.fontFamily = "'pokegb'";
 				flavorText.style.fontSize = "18px";
 			}
 
