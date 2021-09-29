@@ -20,17 +20,181 @@ Module.register("mmm-daily-pokemon", {
 		gbaMode: true, // Changes font to GBA style
 		nameSize: 32, // Changes header size - px
 		flavorText: false, // Displays flavor text for the pokemon
-		useSprite: true // if false, uses official artwork instead
+		useSprite: true, // if false, uses official artwork instead
+		updateContentInterval: 30000, // how frequently content should change/rotate; default 30 seconds
+		fadeSpeed = 4000 // speed of the update animation in ms; default = 4 seconds
 	},
 
 	requiresVersion: "2.1.0", // Required version of MagicMirror
 
 	start: function() { // Setting up interval for refresh
-		const self = this;
+		Log.info("Starting module: " + this.name);
 
+		// Schedule update time to change which Pokemon is displayed
 		setInterval(function() {
-			self.updateDom();
+			this.updateDom();
 		}, this.config.updateInterval);
+
+		// Schedule update timer for rotating the content
+		setInterval(() => {
+			this.updateDom(this.config.fadeSpeed);
+		}, this.config.updateContentInterval);
+	},
+
+	query: function() {
+		return {
+			method: "POST",
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				query: `
+				fragment PokemonEvolutionDataFragment on Pokemon {
+					id
+					name
+					generation
+					evolution_trigger
+					evolution_criteria {
+					  ... on Move {
+						evolution_criteria_name
+						name
+					  }
+					  ... on Item {
+						id
+						evolution_criteria_name
+						name
+						cost
+						bag_pocket
+						effect
+						description
+					  }
+					  ... on Type {
+						evolution_criteria_name
+						name
+					  }
+					  ... on Location {
+						evolution_criteria_name
+						name
+						region {
+						  name
+						}
+						games {
+						  name
+						}
+					  }
+					  ... on Gender {
+						evolution_criteria_name
+						name
+					  }
+					  ... on OtherEvolutionCriteria {
+						evolution_criteria_name
+						value
+					  }
+					}
+				  }
+				  
+				  fragment PokemonEvolutionFragment on Pokemon {
+					evolves_to {
+					  ...PokemonEvolutionDataFragment
+					  evolves_from {
+						...PokemonEvolutionDataFragment
+					  }
+					  evolves_to {
+						...PokemonEvolutionDataFragment
+						evolves_from {
+						  ...PokemonEvolutionDataFragment
+						}
+						evolves_to {
+						  ...PokemonEvolutionDataFragment
+						  evolves_from {
+							...PokemonEvolutionDataFragment
+						  }
+						  evolves_to {
+							...PokemonEvolutionDataFragment
+						  }
+						}
+					  }
+					}
+					evolves_from {
+					  ...PokemonEvolutionDataFragment
+					  evolves_to {
+						...PokemonEvolutionDataFragment
+						evolves_to {
+						  ...PokemonEvolutionDataFragment
+						  evolves_to {
+							...PokemonEvolutionDataFragment
+						  }
+						}
+					  }
+					  evolves_from {
+						...PokemonEvolutionDataFragment
+						evolves_to {
+						  ...PokemonEvolutionDataFragment
+						  evolves_to {
+							...PokemonEvolutionDataFragment
+							evolves_to {
+							  ...PokemonEvolutionDataFragment
+							}
+						  }
+						}
+						evolves_from {
+						  ...PokemonEvolutionDataFragment
+						  evolves_to {
+							...PokemonEvolutionDataFragment
+							evolves_to {
+							  ...PokemonEvolutionDataFragment
+							  evolves_to {
+								...PokemonEvolutionDataFragment
+							  }
+							}
+						  }
+						  evolves_from {
+							...PokemonEvolutionDataFragment
+						  }
+						}
+					  }
+					}
+				  }
+				  
+				  query Query($pokemonId: Int!) {
+					pokemon(id: $pokemonId) {
+					  id
+					  name
+					  genus
+					  nat_dex_num
+					  base_stats {
+						hp
+						attack
+						defense
+						special_attack
+						special_defense
+						speed
+					  }
+					  types {
+						id
+						name
+					  }
+					  pokedex_entries {
+						description
+					  }
+					  abilities {
+						id
+						name
+					  }
+					  egg_groups {
+						id
+						name
+					  }
+					  ...PokemonEvolutionDataFragment
+					  ...PokemonEvolutionFragment
+					}
+				  }
+				`,
+				variables: {
+					pokemonId: Math.floor(Math.random() * (this.config.maxPoke - this.config.minPoke) + this.config.minPoke) // get random pokemon
+				}
+			})
+		}
 	},
 
 	getDom: function() { // Creating initial div
@@ -48,86 +212,99 @@ Module.register("mmm-daily-pokemon", {
 		header.id = "poke-header";
 
 		//wrapper.appendChild(header);
-		this.getData(wrapper); // Sending the request
+		this.getData(); // Send request
 		return wrapper;
 	},
 
-	getData: function(wrapper) { // Sends XHTTPRequest
+	getData: async function() { // Sends XHTTPRequest
 		const self = this;
 		const pokeNumber = Math.round(Math.random()*(this.config.maxPoke - this.config.minPoke) + this.config.minPoke);
-		const apiURL = "https://pokeapi.co/api/v2/pokemon/" + pokeNumber + "/";
-		const httpRequest = new XMLHttpRequest();
 
-		const languageApiURL = "https://pokeapi.co/api/v2/pokemon-species/" + pokeNumber + "/";
-		const languageHttpRequest = new XMLHttpRequest();
-		let translatedName;
-		const languageChosen = this.config.language;
+		const data = await fetch('https://dex-server.herokuapp.com/', this.query())
 
-		languageHttpRequest.onreadystatechange = function() {
-			if (this.readyState == 4 && this.status == 200) {
-				const response = JSON.parse(this.responseText);
-				Log.log(response);
+		return data.json();
 
-				if (self.config.genera){
-					response.genera.forEach(genera => {
-						if(genera.language.name == languageChosen){
-							const pokeSubName = document.getElementById("poke-subname");
-							pokeSubName.innerHTML = genera.genus
-						}
-					});
-				}
+		// fetch('https://dex-server.herokuapp.com/', this.query()).then(res => res.json()).then(results => {
+		// 	console.log(results);
+		// 	data = results;
+		// })
 
-				// Get Translated Name and Flavor Text
-				if (languageChosen){
-					response.names.forEach(nameObject => {
-						if(nameObject.language.name == languageChosen){
-							translatedName = nameObject.name;
-							const pokeName = document.getElementById("poke-name");
-							pokeName.innerHTML = translatedName.charAt(0).toUpperCase() + translatedName.slice(1) + " <br />#" + pokeNumber
-						}
-					});
 
-					const flavorTextDisplay = document.getElementById("flavor-text");
 
-					if (flavorTextDisplay) {
-						function checkLanguage(obj) {
-							return obj.language.name == languageChosen
-						}
-						// get first flavor text matching selected language
-						const flavorTextObj = response.flavor_text_entries.find(checkLanguage);
-						// remove carriage returns, newlines, form-feeds for clean display
-						let sanitizedText = flavorTextObj.flavor_text.replace(/\r\n/g, "")
-						sanitizedText = sanitizedText.replace(/\f/g, " ")
+		// const apiURL = "https://pokeapi.co/api/v2/pokemon/" + pokeNumber + "/";
+		// const httpRequest = new XMLHttpRequest();
 
-						flavorTextDisplay.innerHTML = sanitizedText
-					}
-				}
-			}
-			 else {
-				 return "Loading...";
-			 }
+		// const languageApiURL = "https://pokeapi.co/api/v2/pokemon-species/" + pokeNumber + "/";
+		// const languageHttpRequest = new XMLHttpRequest();
+		// let translatedName;
+		// const languageChosen = this.config.language;
 
-		}
+		// languageHttpRequest.onreadystatechange = function() {
+		// 	if (this.readyState == 4 && this.status == 200) {
+		// 		const response = JSON.parse(this.responseText);
+		// 		Log.log(response);
 
-		httpRequest.onreadystatechange = function() {
-			if (this.readyState == 4 && this.status == 200) {
-				console.log(JSON.parse(this.responseText));
-				const responsePokemon = JSON.parse(this.responseText);
-				Log.log(responsePokemon);
-				languageHttpRequest.open("GET", languageApiURL, true);
-				languageHttpRequest.send();
+		// 		if (self.config.genera){
+		// 			response.genera.forEach(genera => {
+		// 				if(genera.language.name == languageChosen){
+		// 					const pokeSubName = document.getElementById("poke-subname");
+		// 					pokeSubName.innerHTML = genera.genus
+		// 				}
+		// 			});
+		// 		}
 
-				self.createContent(responsePokemon, wrapper);
-			} else {
-				return "Loading...";
-			}
-		}
+		// 		// Get Translated Name and Flavor Text
+		// 		if (languageChosen){
+		// 			response.names.forEach(nameObject => {
+		// 				if(nameObject.language.name == languageChosen){
+		// 					translatedName = nameObject.name;
+		// 					const pokeName = document.getElementById("poke-name");
+		// 					pokeName.innerHTML = translatedName.charAt(0).toUpperCase() + translatedName.slice(1) + " <br />#" + pokeNumber
+		// 				}
+		// 			});
 
-		httpRequest.open("GET", apiURL, true);
-		httpRequest.send();
+		// 			const flavorTextDisplay = document.getElementById("flavor-text");
+
+		// 			if (flavorTextDisplay) {
+		// 				function checkLanguage(obj) {
+		// 					return obj.language.name == languageChosen
+		// 				}
+		// 				// get first flavor text matching selected language
+		// 				const flavorTextObj = response.flavor_text_entries.find(checkLanguage);
+		// 				// remove carriage returns, newlines, form-feeds for clean display
+		// 				let sanitizedText = flavorTextObj.flavor_text.replace(/\r\n/g, "")
+		// 				sanitizedText = sanitizedText.replace(/\f/g, " ")
+
+		// 				flavorTextDisplay.innerHTML = sanitizedText
+		// 			}
+		// 		}
+		// 	}
+		// 	 else {
+		// 		 return "Loading...";
+		// 	 }
+
+		// }
+
+		// httpRequest.onreadystatechange = function() {
+		// 	if (this.readyState == 4 && this.status == 200) {
+		// 		console.log(JSON.parse(this.responseText));
+		// 		const responsePokemon = JSON.parse(this.responseText);
+		// 		Log.log(responsePokemon);
+		// 		languageHttpRequest.open("GET", languageApiURL, true);
+		// 		languageHttpRequest.send();
+
+		// 		self.createContent(responsePokemon, wrapper);
+		// 	} else {
+		// 		return "Loading...";
+		// 	}
+		// }
+
+		// httpRequest.open("GET", apiURL, true);
+		// httpRequest.send();
 	},
 
 	createContent: function(data, wrapper) { // Creates the elements for display
+		console.log('data: ', data)
 		const {id, name, stats, types} = data;
 
 		const bodyEl = document.getElementById('body');
