@@ -22,7 +22,7 @@ Module.register("mmm-daily-pokemon", {
 		flavorText: false, // Displays flavor text for the pokemon
 		useSprite: true, // if false, uses official artwork instead
 		updateContentInterval: 30000, // how frequently content should change/rotate; default 30 seconds
-		fadeSpeed = 4000 // speed of the update animation in ms; default = 4 seconds
+		fadeSpeed: 4000 // speed of the update animation in ms; default = 4 seconds
 	},
 
 	requiresVersion: "2.1.0", // Required version of MagicMirror
@@ -36,9 +36,9 @@ Module.register("mmm-daily-pokemon", {
 		}, this.config.updateInterval);
 
 		// Schedule update timer for rotating the content
-		setInterval(() => {
-			this.updateDom(this.config.fadeSpeed);
-		}, this.config.updateContentInterval);
+		// setInterval(() => {
+		// 	this.updateDom(this.config.fadeSpeed);
+		// }, this.config.updateContentInterval);
 	},
 
 	query: function() {
@@ -162,6 +162,9 @@ Module.register("mmm-daily-pokemon", {
 					  name
 					  genus
 					  nat_dex_num
+					  sprites {
+						front_default
+					  }
 					  base_stats {
 						hp
 						attack
@@ -197,7 +200,7 @@ Module.register("mmm-daily-pokemon", {
 		}
 	},
 
-	getDom: function() { // Creating initial div
+	getDom: async function() { // Creating initial div
 		const wrapper = document.createElement("div");
 		wrapper.id = "poke-wrapper";
 
@@ -212,105 +215,26 @@ Module.register("mmm-daily-pokemon", {
 		header.id = "poke-header";
 
 		//wrapper.appendChild(header);
-		this.getData(); // Send request
+		const datum = await this.getData(); // Send request
+		Log.log(datum)
 		return wrapper;
 	},
 
-	getData: async function() { // Sends XHTTPRequest
+	getData: function(wrapper) { // Sends XHTTPRequest
 		const self = this;
-		const pokeNumber = Math.round(Math.random()*(this.config.maxPoke - this.config.minPoke) + this.config.minPoke);
 
-		const data = await fetch('https://dex-server.herokuapp.com/', this.query())
-
-		return data.json();
-
-		// fetch('https://dex-server.herokuapp.com/', this.query()).then(res => res.json()).then(results => {
-		// 	console.log(results);
-		// 	data = results;
-		// })
-
-
-
-		// const apiURL = "https://pokeapi.co/api/v2/pokemon/" + pokeNumber + "/";
-		// const httpRequest = new XMLHttpRequest();
-
-		// const languageApiURL = "https://pokeapi.co/api/v2/pokemon-species/" + pokeNumber + "/";
-		// const languageHttpRequest = new XMLHttpRequest();
-		// let translatedName;
-		// const languageChosen = this.config.language;
-
-		// languageHttpRequest.onreadystatechange = function() {
-		// 	if (this.readyState == 4 && this.status == 200) {
-		// 		const response = JSON.parse(this.responseText);
-		// 		Log.log(response);
-
-		// 		if (self.config.genera){
-		// 			response.genera.forEach(genera => {
-		// 				if(genera.language.name == languageChosen){
-		// 					const pokeSubName = document.getElementById("poke-subname");
-		// 					pokeSubName.innerHTML = genera.genus
-		// 				}
-		// 			});
-		// 		}
-
-		// 		// Get Translated Name and Flavor Text
-		// 		if (languageChosen){
-		// 			response.names.forEach(nameObject => {
-		// 				if(nameObject.language.name == languageChosen){
-		// 					translatedName = nameObject.name;
-		// 					const pokeName = document.getElementById("poke-name");
-		// 					pokeName.innerHTML = translatedName.charAt(0).toUpperCase() + translatedName.slice(1) + " <br />#" + pokeNumber
-		// 				}
-		// 			});
-
-		// 			const flavorTextDisplay = document.getElementById("flavor-text");
-
-		// 			if (flavorTextDisplay) {
-		// 				function checkLanguage(obj) {
-		// 					return obj.language.name == languageChosen
-		// 				}
-		// 				// get first flavor text matching selected language
-		// 				const flavorTextObj = response.flavor_text_entries.find(checkLanguage);
-		// 				// remove carriage returns, newlines, form-feeds for clean display
-		// 				let sanitizedText = flavorTextObj.flavor_text.replace(/\r\n/g, "")
-		// 				sanitizedText = sanitizedText.replace(/\f/g, " ")
-
-		// 				flavorTextDisplay.innerHTML = sanitizedText
-		// 			}
-		// 		}
-		// 	}
-		// 	 else {
-		// 		 return "Loading...";
-		// 	 }
-
-		// }
-
-		// httpRequest.onreadystatechange = function() {
-		// 	if (this.readyState == 4 && this.status == 200) {
-		// 		console.log(JSON.parse(this.responseText));
-		// 		const responsePokemon = JSON.parse(this.responseText);
-		// 		Log.log(responsePokemon);
-		// 		languageHttpRequest.open("GET", languageApiURL, true);
-		// 		languageHttpRequest.send();
-
-		// 		self.createContent(responsePokemon, wrapper);
-		// 	} else {
-		// 		return "Loading...";
-		// 	}
-		// }
-
-		// httpRequest.open("GET", apiURL, true);
-		// httpRequest.send();
+		fetch('https://dex-server.herokuapp.com/', this.query()).then(res => res.json()).then(results => self.createContent(results, wrapper));
 	},
 
-	createContent: function(data, wrapper) { // Creates the elements for display
-		console.log('data: ', data)
-		const {id, name, stats, types} = data;
+	createContent: function({data}, wrapper) { // Creates the elements for display
+		Log.info('data: ', data)
+		const {id, name, stats, types} = data.pokemon;
 
-		const bodyEl = document.getElementById('body');
-		bodyEl.style.fontFamily = this.config.gbaMode ? "'pokegb'" : "'Montserrat'";
+		// const bodyEl = document.getElementById('body');
+		// bodyEl.style.fontFamily = this.config.gbaMode ? "'pokegb'" : "'Montserrat'";
 
 		const pokeWrapper = document.createElement("div");
+		pokeWrapper.style.fontFamily = this.config.gbaMode ? "'pokegb'" : "'Montserrat'";
 		pokeWrapper.id = "poke-info";
 		const flexWrapper = document.createElement("div");
 		flexWrapper.id = "flex-wrapper";
